@@ -52,22 +52,27 @@ parser.add_argument('-s', '--scalehigh', action='store_true', help='Scale with r
 parser.add_argument('-l', '--linenum',   action='store_true', help='Display line numbers')
 parser.add_argument('-c', '--color',     action='store',      help='Color ticks', default='none', nargs='?')
 parser.add_argument('-b', '--blank',     action='store_true', help='Include blank character')
-parser.add_argument('-d', '--density',   action='store_true', help='Plot instead as density')
-parser.add_argument('-0', '--binary',    action='store_true', help='Plot as binary blocks')
+parser.add_argument('-t', '--type',      action='store',      help='Plot as binary blocks', default='bars', nargs='?')
 args = parser.parse_args()
 
 #$(echo "$(tput setaf 228)▁"):$(echo "$(tput setaf 227)▂"):$(echo "$(tput setaf 226)▃"):$(echo "$(tput setaf 220)▄"):$(echo "$(tput setaf 214)▅"):$(echo "$(tput setaf 208)▆"):$(echo "$(tput setaf 202)▇"):$(echo "$(tput setaf 196)█")"
 
-if args.density:
-  ticks = ['░','▒','▓','█']
-else:
+if args.type=='bars':
   ticks = [' ','▁','▂','▃','▄','▅','▆','▇','█']
-
-if args.binary:
+elif args.type=='shade':
+  ticks = ['░','▒','▓','█']
+elif args.type=='binary':
   ticks = ['▄','▀']
+elif args.type=='circles':
+  ticks = ['·','•','⚫','●','⬤']
+elif args.type=='dots':
+  ticks = ['.','·','˙']
+elif args.type=='rings':
+  ticks = ['˳','∘','°','˚']
 
 if args.blank:
   ticks = [' ']+ticks
+
 
 if args.color == 'ansi':
   printer = ANSIprint(args.blank)
