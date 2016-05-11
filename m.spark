@@ -53,6 +53,7 @@ parser.add_argument('-l', '--linenum',   action='store_true', help='Display line
 parser.add_argument('-c', '--color',     action='store',      help='Color ticks', default='none', nargs='?')
 parser.add_argument('-b', '--blank',     action='store_true', help='Include blank character')
 parser.add_argument('-d', '--density',   action='store_true', help='Plot instead as density')
+parser.add_argument('-0', '--binary',    action='store_true', help='Plot as binary blocks')
 args = parser.parse_args()
 
 #$(echo "$(tput setaf 228)▁"):$(echo "$(tput setaf 227)▂"):$(echo "$(tput setaf 226)▃"):$(echo "$(tput setaf 220)▄"):$(echo "$(tput setaf 214)▅"):$(echo "$(tput setaf 208)▆"):$(echo "$(tput setaf 202)▇"):$(echo "$(tput setaf 196)█")"
@@ -61,6 +62,9 @@ if args.density:
   ticks = ['░','▒','▓','█']
 else:
   ticks = [' ','▁','▂','▃','▄','▅','▆','▇','█']
+
+if args.binary:
+  ticks = ['▄','▀']
 
 if args.blank:
   ticks = [' ']+ticks
