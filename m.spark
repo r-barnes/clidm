@@ -5,6 +5,45 @@ import sys
 import argparse
 import os
 
+class ANSIprint:
+  def __init__(self,blank):
+    self.colors = ['\033[37m','\033[37m','\033[97m','\033[33m','\033[33m','\033[93m','\033[31m','\033[91m']
+    if blank:
+      self.colors = ['']+self.colors
+
+  def disp(self,x):
+    sys.stdout.write('{0}{1}'.format(self.colors[x], ticks[x]))
+
+  def reset(self):
+    sys.stdout.write('\033[39m\n')
+
+#export TERM  = "xterm-256color"
+class TputPrint:
+  def __init__(self,blank):
+    self.colors = ['228','227','226','220','214','208','202','196']
+    if blank:
+      self.colors = ['7']+self.colors
+
+  def disp(self,x):
+    os.system("tput setaf {0}; echo -n {1}".format(self.colors[x], ticks[x]))
+
+  def reset(self):
+    os.system("tput setaf 7")
+    sys.stdout.write("\n")
+
+class PlainPrint:
+  def __init__(self,blank):
+    pass
+
+  def disp(self,x):
+    sys.stdout.write(ticks[x])
+
+  def reset(self):
+    sys.stdout.write("\n")
+
+
+
+
 parser = argparse.ArgumentParser(prog='PROG')
 parser.add_argument('-m', '--minmax',    action='store_true', help='Display min and max')
 parser.add_argument('-a', '--avg',       action='store_true', help='Display average')
@@ -12,43 +51,26 @@ parser.add_argument('-p', '--par',       action='store_true', help='Display peak
 parser.add_argument('-s', '--scalehigh', action='store_true', help='Scale with respect to highest value ever seen')
 parser.add_argument('-l', '--linenum',   action='store_true', help='Display line numbers')
 parser.add_argument('-c', '--color',     action='store',      help='Color ticks', default='none', nargs='?')
+parser.add_argument('-b', '--blank',     action='store_true', help='Include blank character')
+parser.add_argument('-d', '--density',   action='store_true', help='Plot instead as density')
 args = parser.parse_args()
 
 #$(echo "$(tput setaf 228)▁"):$(echo "$(tput setaf 227)▂"):$(echo "$(tput setaf 226)▃"):$(echo "$(tput setaf 220)▄"):$(echo "$(tput setaf 214)▅"):$(echo "$(tput setaf 208)▆"):$(echo "$(tput setaf 202)▇"):$(echo "$(tput setaf 196)█")"
 
-ticks         = ['▁','▂','▃','▄','▅','▆','▇','█']
+if args.density:
+  ticks = ['░','▒','▓','█']
+else:
+  ticks = [' ','▁','▂','▃','▄','▅','▆','▇','█']
 
-class ANSIprint:
-  def disp(self,x):
-    ansi_colors   = ['\033[37m','\033[37m','\033[97m','\033[33m','\033[33m','\033[93m','\033[31m','\033[91m']
-    sys.stdout.write('{0}{1}'.format(ansi_colors[x], ticks[x]))
-
-  def reset(self):
-    sys.stdout.write('\033[39m\n')
-
-class TputPrint:
-#export TERM  = "xterm-256color"
-  def disp(self,x):
-    tput_colors   = ['228','227','226','220','214','208','202','196']
-    os.system("tput setaf {0}; echo -n {1}".format(tput_colors[x], ticks[x]))
-
-  def reset(self):
-    os.system("tput setaf 7")
-    sys.stdout.write("\n")
-
-class PlainPrint:
-  def disp(self,x):
-    sys.stdout.write(ticks[x])
-
-  def reset(self):
-    sys.stdout.write("\n")
+if args.blank:
+  ticks = [' ']+ticks
 
 if args.color == 'ansi':
-  printer = ANSIprint()
+  printer = ANSIprint(args.blank)
 elif args.color == 'tput':
-  printer = TputPrint()
+  printer = TputPrint(args.blank)
 else:
-  printer = PlainPrint()
+  printer = PlainPrint(args.blank)
 
 
 highestever = -99e9
@@ -62,6 +84,7 @@ for line in sys.stdin:
       line[i] = float(line[i])
     except:
       line[i] = None
+
   line        = filter(lambda x: x is not None, line)
   linemax     = max(line)
   linemin     = min(line)
@@ -82,7 +105,7 @@ for line in sys.stdin:
     linemax = highestever
 
   if linemin!=linemax:
-    line     = [min(int(8*(x-linemin)/(linemax-linemin)),7) for x in line]
+    line     = [min(int(len(ticks)*(x-linemin)/(linemax-linemin)),len(ticks)-1) for x in line]
   else:
     line = [4]*len(line)
 
