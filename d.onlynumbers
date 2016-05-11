@@ -1,0 +1,41 @@
+#!/usr/bin/python
+import sys
+import fileinput
+
+numbers="0123456789"
+
+def extract_numbers(line):
+  line=line.strip()
+  if len(line)==0:
+    return ""
+  isnum=False
+  ret=""
+  for i in range(len(line)):
+    if not isnum:
+      if line[i] in numbers:
+        isnum=True
+      elif line[i]=='-' and line[i-1] in numbers and line[i+1] in numbers:
+        isnum=True
+    else:
+      if not line[i] in numbers:
+        if line[i]=='.' and (line[i-1] in numbers and line[i+1] in numbers):
+          pass
+        elif line[i] in "eE" and line[i-1] in numbers and line[i+1] in "-+" and line[i+2] in numbers:
+          pass
+        elif line[i] in "-+" and line[i-2] in numbers and line[i-1] in "eE" and line[i+1] in numbers:
+          pass
+        else:
+          isnum=False
+          ret+=" "
+    
+
+    if isnum:
+      ret+=line[i]
+
+  return ret
+
+def main():
+  for line in fileinput.input():
+    print extract_numbers(line)
+
+main()

@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+#Prevent lines from wrapping on print
+
+
+import sys
+
+print('\033[?7l', end='')
+for line in sys.stdin:
+  print(line, end='')
+print('\033[?7h', end='')

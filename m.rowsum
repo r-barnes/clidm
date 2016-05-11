@@ -1,0 +1,34 @@
+#!/usr/bin/python
+import sys
+import argparse
+import re
+
+def main():
+  parser = argparse.ArgumentParser(description='Sum a row')
+  parser.add_argument('-d','--delimiter', help='Split the string on this character. (Default: space)', default='\s+')
+  parser.add_argument('-o','--original', help='Print new values as column to right of original. (Default:false)', action='store_const', const=True, default=False)
+  parser.add_argument('infile', nargs='?', type=argparse.FileType('r'), default=sys.stdin)
+
+  args = parser.parse_args()
+
+  for l in args.infile.readlines():
+    l=l.strip()
+    if len(l)==0:
+      continue
+
+    #try:
+    v = re.split(args.delimiter,l)
+    v = sum(map(float,v))
+    if v==int(v):
+      v = str(int(v))
+    else:
+      v = str(v)
+    if args.original:
+      print "%s %s" % (l,v)
+    else:
+      print v
+   # except:
+    #  sys.stderr.write("Issue arose\n")
+     # print l
+
+main()

@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+
+import sys
+
+if len(sys.argv)==1:
+  print("{0} <WORD> [WORD] [WORD]".format(sys.argv[0]))
+  sys.exit(-1)
+
+words = sys.argv[1:]
+
+for line in sys.stdin:
+  if all([x in line for x in words]):
+    print(line, end="")

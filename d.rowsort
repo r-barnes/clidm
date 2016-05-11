@@ -1,0 +1,21 @@
+#!/usr/bin/python
+import sys
+import argparse
+
+def main():
+  parser = argparse.ArgumentParser(description='Sort the elements of a row')
+  parser.add_argument('-d','--delimiter', help='Split the string on this character. (Default: space)', default=' ')
+  parser.add_argument('infile', nargs='?', type=argparse.FileType('r'), default=sys.stdin)
+  parser.add_argument('-r','--reverse', help='Output in reverse order (default: ascending)', action='store_true', default=False)
+  parser.add_argument('-n','--numeric', help='Treat input data as numeric (default: false)', action='store_const', const=lambda x: float(x), default=str)
+
+
+  args = parser.parse_args()
+
+  for line in args.infile:
+    line=line.strip()
+    line=line.split(args.delimiter)
+    line=sorted(line, reverse=args.reverse, key=args.numeric)
+    print args.delimiter.join(map(str,line))
+
+main()

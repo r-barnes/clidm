@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+
+import sys
+
+if len(sys.argv)==1:
+  print("{0} <DELIMITER> <KEY>".format(sys.argv[0]))
+  sys.exit(-1)
+
+last_key = None
+prev     = ""
+
+delim = sys.argv[1]
+key   = int(sys.argv[2])
+
+for line in sys.stdin:
+  line     = line.replace("\n","")
+  elements = line.split(delim)
+  if elements[key]!=last_key:
+    last_key = elements[key]
+    if prev:
+      print(prev)
+    prev = ""
+
+  if prev:
+    prev += delim + line
+  else:
+    prev = line
+
+print(prev)

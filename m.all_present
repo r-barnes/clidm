@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+
+import sys
+import functools
+
+lines    = sys.stdin.readlines()
+lines    = list(map(lambda x: round(float(x)),lines))
+
+numbers = set(range(min(lines),max(lines)+1))
+lines   = set(lines)
+
+if lines==numbers:
+  print("All numbers present")
+else:
+  print("Missing values: ",numbers-lines)

@@ -1,0 +1,2 @@
+#!/bin/bash
+awk 'BEGIN{t=0;c=0;}{t=t+$1;}END{print t/NR}'

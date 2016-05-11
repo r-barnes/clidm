@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+
+import sys
+
+line_num = 0
+line_mod = int(sys.argv[1])
+
+buffer = ""
+
+for line in sys.stdin:
+  if buffer and line_num%line_mod==0:
+    print(buffer)
+    buffer = ""
+
+  line_num += 1
+  buffer   += line.replace("\n","") + " "
+
+print(buffer)

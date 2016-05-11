@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+
+import sys
+
+color_list = [91,92,93,94,95,96,97]
+color      = -1
+last_key   = None
+
+sys.argv[2] = int(sys.argv[2])
+
+for line in sys.stdin:
+  elements = line.split(sys.argv[1])
+  if elements[sys.argv[2]]!=last_key:
+    last_key = elements[sys.argv[2]]
+    color   += 1
+    color    = color%len(color_list)
+  print("\033[{0}m{1}".format(color_list[color],line.replace("\n","")))
+
+print("\033[39m", end="")

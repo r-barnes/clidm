@@ -1,0 +1,2 @@
+#!/bin/bash
+awk 'p{print $0-p}{p=$0}'
