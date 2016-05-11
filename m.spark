@@ -3,17 +3,57 @@
 
 import sys
 import argparse
+import os
 
 parser = argparse.ArgumentParser(prog='PROG')
 parser.add_argument('-m', '--minmax',    action='store_true', help='Display min and max')
 parser.add_argument('-a', '--avg',       action='store_true', help='Display average')
 parser.add_argument('-p', '--par',       action='store_true', help='Display peak to average ratio')
 parser.add_argument('-s', '--scalehigh', action='store_true', help='Scale with respect to highest value ever seen')
+parser.add_argument('-l', '--linenum',   action='store_true', help='Display line numbers')
+parser.add_argument('-c', '--color',     action='store',      help='Color ticks', default='none', nargs='?')
 args = parser.parse_args()
 
-ticks = ['▁','▂','▃','▄','▅','▆','▇','█']
+#$(echo "$(tput setaf 228)▁"):$(echo "$(tput setaf 227)▂"):$(echo "$(tput setaf 226)▃"):$(echo "$(tput setaf 220)▄"):$(echo "$(tput setaf 214)▅"):$(echo "$(tput setaf 208)▆"):$(echo "$(tput setaf 202)▇"):$(echo "$(tput setaf 196)█")"
+
+ticks         = ['▁','▂','▃','▄','▅','▆','▇','█']
+
+class ANSIprint:
+  def disp(self,x):
+    ansi_colors   = ['\033[37m','\033[37m','\033[97m','\033[33m','\033[33m','\033[93m','\033[31m','\033[91m']
+    sys.stdout.write('{0}{1}'.format(ansi_colors[x], ticks[x]))
+
+  def reset(self):
+    sys.stdout.write('\033[39m\n')
+
+class TputPrint:
+#export TERM  = "xterm-256color"
+  def disp(self,x):
+    tput_colors   = ['228','227','226','220','214','208','202','196']
+    os.system("tput setaf {0}; echo -n {1}".format(tput_colors[x], ticks[x]))
+
+  def reset(self):
+    os.system("tput setaf 7")
+    sys.stdout.write("\n")
+
+class PlainPrint:
+  def disp(self,x):
+    sys.stdout.write(ticks[x])
+
+  def reset(self):
+    sys.stdout.write("\n")
+
+if args.color == 'ansi':
+  printer = ANSIprint()
+elif args.color == 'tput':
+  printer = TputPrint()
+else:
+  printer = PlainPrint()
+
 
 highestever = -99e9
+
+linenum = 1
 
 for line in sys.stdin:
   line = line.split()
@@ -28,6 +68,9 @@ for line in sys.stdin:
   average     = (sum(line)/len(line))
   highestever = max(linemax,highestever)
 
+  if args.linenum:
+    print '{0:5} '.format(linenum),
+    linenum += 1
   if args.minmax:
     print 'min={0:10} max={1:10}'.format(linemin,linemax),
   if args.avg:
@@ -43,6 +86,6 @@ for line in sys.stdin:
   else:
     line = [4]*len(line)
 
-  line     = [ticks[x] for x in line]
-
-  print( ''.join(line) )
+  for x in line:
+    printer.disp(x)
+  printer.reset()
