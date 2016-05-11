@@ -5,10 +5,10 @@ import sys
 import argparse
 
 parser = argparse.ArgumentParser(prog='PROG')
-parser.add_argument('-m', action='store_true', help='Display min and max')
-parser.add_argument('-a', action='store_true', help='Display average')
-parser.add_argument('-p', action='store_true', help='Display peak to average ratio')
-parser.add_argument('-s', action='store_true', help='Scale with respect to highest value ever seen')
+parser.add_argument('-m', '--minmax',    action='store_true', help='Display min and max')
+parser.add_argument('-a', '--avg',       action='store_true', help='Display average')
+parser.add_argument('-p', '--par',       action='store_true', help='Display peak to average ratio')
+parser.add_argument('-s', '--scalehigh', action='store_true', help='Scale with respect to highest value ever seen')
 args = parser.parse_args()
 
 ticks = ['▁','▂','▃','▄','▅','▆','▇','█']
@@ -28,14 +28,14 @@ for line in sys.stdin:
   average     = (sum(line)/len(line))
   highestever = max(linemax,highestever)
 
-  if args.m:
+  if args.minmax:
     print 'min={0:10} max={1:10}'.format(linemin,linemax),
-  if args.a:
+  if args.avg:
     print 'avg={0:10}'.format(average),
-  if args.p:
+  if args.par:
     print 'par={0:10}'.format(linemax/average),
 
-  if args.s:
+  if args.scalehigh:
     linemax = highestever
 
   if linemin!=linemax:
