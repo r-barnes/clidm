@@ -4,6 +4,10 @@
 import sys
 import argparse
 import os
+import signal
+
+from signal import signal, SIGPIPE, SIG_DFL
+signal(SIGPIPE,SIG_DFL) 
 
 class ANSIprint:
   def __init__(self,blank):
@@ -122,5 +126,11 @@ for line in sys.stdin:
     line = [4]*len(line)
 
   for x in line:
-    printer.disp(x)
-  printer.reset()
+    try:
+      printer.disp(x)
+    except:
+      sys.exit(0)
+  try:
+    printer.reset()
+  except:
+    sys.exit(0)
