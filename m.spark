@@ -48,6 +48,7 @@ parser = argparse.ArgumentParser(prog='PROG')
 parser.add_argument('-m', '--minmax',    action='store_true', help='Display min and max')
 parser.add_argument('-a', '--avg',       action='store_true', help='Display average')
 parser.add_argument('-p', '--par',       action='store_true', help='Display peak to average ratio')
+parser.add_argument('--apr',             action='store_true', help='Display average to peak ratio')
 parser.add_argument('-s', '--scalehigh', action='store_true', help='Scale with respect to highest value ever seen')
 parser.add_argument('-l', '--linenum',   action='store_true', help='Display line numbers')
 parser.add_argument('-c', '--color',     action='store',      help='Color ticks', default='none', nargs='?')
@@ -109,6 +110,8 @@ for line in sys.stdin:
     print 'avg={0:10}'.format(average),
   if args.par:
     print 'par={0:10}'.format(linemax/average),
+  if args.apr:
+    print 'apr={0:10}'.format(average/linemax),
 
   if args.scalehigh:
     linemax = highestever
