@@ -58,6 +58,7 @@ parser.add_argument('-l', '--linenum',   action='store_true', help='Display line
 parser.add_argument('-c', '--color',     action='store',      help='Color ticks', default='none', nargs='?')
 parser.add_argument('-b', '--blank',     action='store_true', help='Include blank character')
 parser.add_argument('-t', '--type',      action='store',      help='Plot as binary blocks', default='bars', nargs='?')
+parser.add_argument('-i', '--ignore',    action='store_true', help='Use first word as tag')
 args = parser.parse_args()
 
 #$(echo "$(tput setaf 228)▁"):$(echo "$(tput setaf 227)▂"):$(echo "$(tput setaf 226)▃"):$(echo "$(tput setaf 220)▄"):$(echo "$(tput setaf 214)▅"):$(echo "$(tput setaf 208)▆"):$(echo "$(tput setaf 202)▇"):$(echo "$(tput setaf 196)█")"
@@ -93,6 +94,10 @@ linenum = 1
 
 for line in sys.stdin:
   line = line.split()
+  tag  = None
+  if args.ignore:
+    tag  = line[0]
+    line = line[1:]
   for i in range(len(line)):
     try:
       line[i] = float(line[i])
@@ -105,17 +110,19 @@ for line in sys.stdin:
   average     = (sum(line)/len(line))
   highestever = max(linemax,highestever)
 
+  if tag:
+    print '{0} '.format(tag),
   if args.linenum:
     print '{0:5} '.format(linenum),
     linenum += 1
   if args.minmax:
-    print 'min={0:10} max={1:10}'.format(linemin,linemax),
+    print 'min={0:10} max={1:10} '.format(linemin,linemax),
   if args.avg:
-    print 'avg={0:10}'.format(average),
+    print 'avg={0:10} '.format(average),
   if args.par:
-    print 'par={0:10}'.format(linemax/average),
+    print 'par={0:10} '.format(linemax/average),
   if args.apr:
-    print 'apr={0:10}'.format(average/linemax),
+    print 'apr={0:10} '.format(average/linemax),
 
   if args.scalehigh:
     linemax = highestever
