@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+
+import sys
+import re
+import argparse
+
+color_lists = {
+  #Richard Barnes made this one up
+  # "default": [91,36,92,93,94,35,95,32,96,97],
+  #From ColorBrewer2
+  "default": ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a'],
+  #rain14, rain15, rain18, rain21 are drawn from https://www.r-bloggers.com/the-paul-tol-21-color-salute/
+  "rain14": ("#882E72", "#B178A6", "#D6C1DE", "#1965B0", "#5289C7", "#7BAFDE", "#4EB265", "#90C987", "#CAE0AB", "#F7EE55", "#F6C141", "#F1932D", "#E8601C", "#DC050C"),
+  "rain15": ("#114477", "#4477AA", "#77AADD", "#117755", "#44AA88", "#99CCBB", "#777711", "#AAAA44", "#DDDD77", "#771111", "#AA4444", "#DD7777", "#771144", "#AA4477", "#DD77AA"),
+  "rain18": ("#771155", "#AA4488", "#CC99BB", "#114477", "#4477AA", "#77AADD", "#117777", "#44AAAA", "#77CCCC", "#777711", "#AAAA44", "#DDDD77", "#774411", "#AA7744", "#DDAA77", "#771122", "#AA4455", "#DD7788"),
+  "rain21": ("#771155", "#AA4488", "#CC99BB", "#114477", "#4477AA", "#77AADD", "#117777", "#44AAAA", "#77CCCC", "#117744", "#44AA77", "#88CCAA", "#777711", "#AAAA44", "#DDDD77", "#774411", "#AA7744", "#DDAA77", "#771122", "#AA4455", "#DD7788")
+}
+
+color_list = color_lists["default"]
+sep        = False
+
+if len(sys.argv)>1:
+  color_list = color_lists[sys.argv[1]]
+  sep         = True
+
+#Strip leading '#'
+color_list = [x[1:] for x in color_list]
+#Convert list to RGB
+color_list = [(int(x[0:2], 16), int(x[2:4], 16), int(x[4:6], 16)) for x in color_list]
+
+for line in sys.stdin:
+  line = re.split(r'(\s+)', line)
+  for i in range(len(line)):
+    if line[i].isnumeric():
+      try:
+        color = color_list[int(line[i])]
+      except:
+        color = (255,255,255)
+        # print("Unknown color {0}".format(line[i]))
+        # sys.exit(-1)
+      line[i] = "\033[38;2;{0};{1};{2}m{3}\033[39m".format(*color,line[i])
+  print(''.join(line), end='')
+
+  # line = line.replace("\0000","\033[{0}m0\033[39m".format(color_list[0]))
+  # line = line.replace("\0001","\033[{0}m1\033[39m".format(color_list[1]))
+  # line = line.replace("\0002","\033[{0}m2\033[39m".format(color_list[2]))
+  # line = line.replace("\0003","\033[{0}m3\033[39m".format(color_list[3]))
+  # line = line.replace("\0004","\033[{0}m4\033[39m".format(color_list[4]))
+  # line = line.replace("\0005","\033[{0}m5\033[39m".format(color_list[5]))
+  # line = line.replace("\0006","\033[{0}m6\033[39m".format(color_list[6]))
+  # line = line.replace("\0007","\033[{0}m7\033[39m".format(color_list[7]))
+  # line = line.replace("\0008","\033[{0}m8\033[39m".format(color_list[8]))
+  # line = line.replace("\0009","\033[{0}m9\033[39m".format(color_list[9]))
+
+  # print(line, end="")
