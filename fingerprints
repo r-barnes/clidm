@@ -1,0 +1,4 @@
+#!/bin/bash
+ssh-keygen -lf /etc/ssh/ssh_host_rsa_key.pub
+ssh-keygen -lf /etc/ssh/ssh_host_dsa_key.pub
+ssh-keygen -lf /etc/ssh/ssh_host_ecdsa_key.pub
