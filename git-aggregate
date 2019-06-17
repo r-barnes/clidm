@@ -1,0 +1,22 @@
+#!/bin/bash
+
+echo "hi"
+
+git clone $1 /z/repo_sub
+
+git remote add repo_sub /z/repo_sub
+git fetch repo_sub
+
+git checkout -b repo_sub repo_sub/master
+mkdir -p $2 
+
+git mv -k * $2
+
+git commit -m "Moved sub-repo files to $2"
+
+git checkout master
+git merge --allow-unrelated-histories repo_sub -m "Merging '$1' into master at '$2'"
+
+git branch -D repo_sub
+git remote remove repo_sub
+rm -rf /z/repo_sub

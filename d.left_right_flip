@@ -2,5 +2,6 @@
 
 import sys
 
-for line in sys:
-  print(line[::-1])
+for line in sys.stdin:
+  line=line.split()
+  print(' '.join(reversed(line)))

@@ -3,6 +3,7 @@ import sys
 import fileinput
 
 numbers="0123456789"
+spaces=" \t\n"
 
 def extract_numbers(line):
   line=line.strip()
@@ -14,7 +15,7 @@ def extract_numbers(line):
     if not isnum:
       if line[i] in numbers:
         isnum=True
-      elif line[i]=='-' and line[i-1] in numbers and line[i+1] in numbers:
+      elif line[i]=='-' and line[i-1] in spaces and line[i+1] in numbers:
         isnum=True
     else:
       if not line[i] in numbers:
