@@ -1,0 +1,12 @@
+#!/bin/bash
+if repo_root=`git rev-parse --show-toplevel`; then
+	submod_root=${repo_root}/submodules
+	if [ -d "$submod_root" ] 
+	then
+		rm -rf "$submod_root"
+		git checkout -- "$submod_root"
+		git submodule update --init --recursive
+	else
+	    echo "Could not locate submodule directory '${submod_root}'!"
+	fi
+fi
