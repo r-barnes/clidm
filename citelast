@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+
+import glob
+import os
+import pyperclip
+import sys
+
+sdir  = "/z/downloads"
+files = [f for f in os.listdir(sdir) if os.path.isfile(os.path.join(sdir, f))]
+files = [f for f in files if f.endswith(".bib") or f.endswith(".ris") or f.endswith(".bibtex")]
+files = [os.path.join(sdir,f) for f in files]
+
+if len(files)==0:
+  sys.exit(0)
+
+for i,x in enumerate(files):
+  print(f"{i:>2} {x}")
+choice = int(input("Which citation? "))
+
+file = files[choice]
+
+pyperclip.copy(open(file,'r').read())
+
+os.remove(file)
