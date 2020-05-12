@@ -1,0 +1,3 @@
+#!/bin/bash
+#Call to move with arguments in opposite order to quickly unmove a file
+mv $2 $1
