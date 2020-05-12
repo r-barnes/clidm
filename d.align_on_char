@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+import sys
+import fileinput
+import argparse
+import collections
+
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('files', metavar='files', type=str, nargs='*', help='Files to align')
+parser.add_argument('--delimeter', '-d', type=str, required=True, help='Delimeter to align on')
+parser.add_argument('--spaces', '-s', action="store_true", help="Put spaces around delimeter in output")
+args = parser.parse_args()
+
+width = collections.defaultdict(lambda: 0)
+
+records = [line.rstrip('\n').split(args.delimeter) for line in fileinput.input(args.files)]
+maxcols = 0
+for row in records:
+  maxcols = max(maxcols, len(row))
+  for idx, column in enumerate(row):
+    width[idx] = max(width[idx], len(column))
+
+if args.spaces:
+  sep = ' ' + args.delimeter + ' '
+else:
+  sep = args.delimeter
+
+for row in records:
+  for i in range(min(len(row),maxcols)):
+    print(row[i].ljust(width[i]), end='')
+    if i<len(row)-1:
+      print(sep, end='')
+  print('')
