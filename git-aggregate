@@ -1,6 +1,16 @@
 #!/bin/bash
 
-echo "hi"
+if [ "$#" -ne 2 ]; then
+    echo "git aggregate <Address of sup repo> <Directory to add repo to relative to current directory>"
+    exit 1
+fi
+
+set -ex
+
+curdir=`pwd`
+repotop=`git rev-parse --show-toplevel`
+
+cd ${repotop}
 
 git clone $1 /z/repo_sub
 
@@ -8,9 +18,9 @@ git remote add repo_sub /z/repo_sub
 git fetch repo_sub
 
 git checkout -b repo_sub repo_sub/master
-mkdir -p $2 
+mkdir -p ${repotop}/$2 
 
-git mv -k * $2
+git mv -k * ${repotop}/$2
 
 git commit -m "Moved sub-repo files to $2"
 
@@ -20,3 +30,5 @@ git merge --allow-unrelated-histories repo_sub -m "Merging '$1' into master at '
 git branch -D repo_sub
 git remote remove repo_sub
 rm -rf /z/repo_sub
+
+cd ${curdir}
