@@ -1,0 +1,2 @@
+#!/bin/bash
+/usr/bin/aplay -q ~/bin/beep-7.wav
