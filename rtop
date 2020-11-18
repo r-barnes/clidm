@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+#A side-scrolling time series resource monitor
+
 from collections import deque
 import argparse
 import time
