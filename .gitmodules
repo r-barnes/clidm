@@ -1,0 +1,6 @@
+[submodule "submodules/duf"]
+	path = submodules/duf
+	url = https://github.com/muesli/duf.git
+[submodule "submodules/fzf"]
+	path = submodules/fzf
+	url = https://github.com/junegunn/fzf

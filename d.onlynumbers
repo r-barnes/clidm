@@ -28,7 +28,7 @@ def extract_numbers(line):
         else:
           isnum=False
           ret+=" "
-    
+
 
     if isnum:
       ret+=line[i]
@@ -37,6 +37,6 @@ def extract_numbers(line):
 
 def main():
   for line in fileinput.input():
-    print extract_numbers(line)
+    print(extract_numbers(line))
 
 main()
