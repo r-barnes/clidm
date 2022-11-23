@@ -4,23 +4,24 @@
 
 from collections import deque
 import argparse
+import psutil
 import time
+from typing import Deque, List, Optional
 
 import GPUtil
 import numpy as np
-import psutil
-
-psutil.virtual_memory()
 
 class SystemMonitor:
-  def __init__(self, width=60):
-    self.cores     = psutil.cpu_count()
-    self.gpus      = len(GPUtil.getGPUs())
-    self.cpu_calcs = [deque(maxlen=width) for i in range(self.cores)]
-    self.gpu_calcs = [deque(maxlen=width) for i in range(self.gpus)]
-    self.gpu_mem   = [deque(maxlen=width) for i in range(self.gpus)]
-    self.mem       = deque(maxlen=width)
-    self.swap      = deque(maxlen=width)
+  def __init__(self, width: int = 60):
+    self.cores = psutil.cpu_count()
+    self.gpus = len(GPUtil.getGPUs())
+    self.cpu_calcs: List[Deque[str]] = [deque(maxlen=width) for _ in range(self.cores)]
+    self.gpu_calcs: List[Deque[str]] = [deque(maxlen=width) for _ in range(self.gpus)]
+    self.gpu_mem: List[Deque[str]]   = [deque(maxlen=width) for _ in range(self.gpus)]
+    self.mem: Deque[str] = deque(maxlen=width)
+    self.swap: Deque[str] = deque(maxlen=width)
+    self._partitions = [x.mountpoint for x in psutil.disk_partitions() if x.mountpoint in {"/", "/home"}]
+    self.part_space: List[Deque[str]] = [deque(maxlen=width) for _ in range(len(self._partitions))]
 
     self.bars             = np.array([' ','▁','▂','▃','▄','▅','▆','▇','█'])
     self.calc_tick_values = np.linspace(0,100,len(self.bars))
@@ -31,22 +32,23 @@ class SystemMonitor:
 
     print("\033[2J") #Clear the screen
 
-  def update(self):
+  def update(self) -> None:
     self._update_cpu()
     self._update_gpu()
     self._update_ram()
     self._update_swap()
+    self._update_partition_space()
 
   def _render_calc(self, vals):
     return self.bars[np.digitize(vals, self.calc_tick_values)-1]
 
-  def _update_cpu(self):
+  def _update_cpu(self) -> None:
     self.current_cpus = np.array(psutil.cpu_percent(interval=0, percpu=True))
     for i, x in enumerate(self._render_calc(self.current_cpus)):
       self.cpu_calcs[i].append(x)
 
-  def _update_gpu(self):
-    ret      = GPUtil.getGPUs()
+  def _update_gpu(self) -> None:
+    ret = GPUtil.getGPUs()
     self.current_gpu_calc = [100*x.load for x in ret]
     self.current_gpu_mem  = [100*x.memoryUtil for x in ret]
     for i, x in enumerate(self._render_calc(self.current_gpu_calc)):
@@ -54,15 +56,20 @@ class SystemMonitor:
     for i, x in enumerate(self._render_calc(self.current_gpu_mem)):
       self.gpu_mem[i].append(x)
 
-  def _update_ram(self):
+  def _update_ram(self) -> None:
     self.current_mem = psutil.virtual_memory().percent
     self.mem.append(self._render_calc(self.current_mem))
 
-  def _update_swap(self):
+  def _update_swap(self) -> None:
     self.current_swap = psutil.swap_memory().percent
     self.swap.append(self._render_calc(self.current_swap))
 
-  def _print_top_procs(self, n=10, rate=1):
+  def _update_partition_space(self) -> None:
+    self.current_part_space = [psutil.disk_usage(x).percent for x in self._partitions]
+    for i, x in enumerate(self._render_calc(self.current_part_space)):
+      self.part_space[i].append(x)
+
+  def _print_top_procs(self, n: int = 10, rate: float = 1.0):
     if self.last_proc is not None and time.time()-self.last_proc<rate:
       return
     self.last_proc = time.time()
@@ -80,43 +87,49 @@ class SystemMonitor:
     for x in self.proc_info:
       print("\033[2K{cpu_percent:4} {name:20} pid={pid}".format(**x))
 
-  def print(self):
+  def print(self) -> None:
     self._clear_screen_at_interval()
     print("\033[1;1H") #Reset cursor position
-    self._print_list(name="CPU",     lst=self.cpu_calcs, current=self.current_cpus)
+    self._print_list(name="CPU",     bars=self.cpu_calcs, current=self.current_cpus)
     print("\033[2K")
-    self._print_list(name="GPU",     lst=self.gpu_calcs, current=self.current_gpu_calc)
-    self._print_list(name="GPU RAM", lst=self.gpu_mem,   current=self.current_gpu_mem)
+    self._print_list(name="GPU",     bars=self.gpu_calcs, current=self.current_gpu_calc)
+    self._print_list(name="GPU RAM", bars=self.gpu_mem,   current=self.current_gpu_mem)
     print("\033[2K")
-    self._print_nonlist(name="RAM",  vals=self.mem,      current=self.current_mem)
-    self._print_nonlist(name="Swap", vals=self.swap,     current=self.current_swap)
+    self._print_nonlist(name="RAM",  bars=self.mem,      current=self.current_mem)
+    self._print_nonlist(name="Swap", bars=self.swap,     current=self.current_swap)
+    print("\033[2K")
+    self._print_list(name=self._partitions, bars=self.part_space, current=self.current_part_space)
     print("\033[2K")
     self._print_top_procs()
 
   @staticmethod
-  def _clear_screen():
+  def _clear_screen() -> None:
     print("\033[1;1H")
 
-  def _clear_screen_at_interval(self, rate=10):
+  def _clear_screen_at_interval(self, rate: int = 10) -> None:
     if self.last_clear is not None and time.time()-self.last_clear<rate:
       return
     self.last_clear = time.time()
 
     print("\033[2J") #Clear the screen
 
-  def _print_list(self, name, lst, current=None):
-    for i in range(len(lst)):
-      print(f"\033[2K{name:7} {i:2}: \033[{self.colors[i%len(self.colors)]}m{self.bars[-1]}|", end='')
-      print(''.join(lst[i]), end='')
+  def _print_list(self, name: str, bars: List[Deque[str]], current: Optional[List[float]] = None) -> None:
+    for i in range(len(bars)):
+      if isinstance(name, list):
+        this_name = name[i]
+      else:
+        this_name = name + f" {i:2}"
+      print(f"\033[2K{this_name:7}: \033[{self.colors[i%len(self.colors)]}m{self.bars[-1]}|", end='')
+      print(''.join(bars[i]), end='')
       print(f"|{self.bars[-1]}\033[39m", end='')
       if current is None:
         print("")
       else:
         print(f" {current[i]:5.1f}%")
 
-  def _print_nonlist(self, name, vals, current=None):
+  def _print_nonlist(self, name: str, bars: Deque[str], current: Optional[float] = None) -> None:
     print(f"\033[2K{name:5}     : {self.bars[-1]}|", end='')
-    print(''.join(vals), end='')
+    print(''.join(bars), end='')
     print(f"|{self.bars[-1]}\033[39m", end='')
     if current is None:
       print("")
@@ -124,7 +137,7 @@ class SystemMonitor:
       print(f" {current:5.1f}%")
 
 
-def monitor(speed):
+def monitor(speed: float) -> None:
   sm = SystemMonitor()
 
   while True:
