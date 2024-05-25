@@ -1,0 +1,25 @@
+#!/bin/bash
+perl -pe 's/\bJan\b/01/' | \
+perl -pe 's/\bFeb\b/02/' | \
+perl -pe 's/\bMar\b/03/' | \
+perl -pe 's/\bApr\b/04/' | \
+perl -pe 's/\bMay\b/05/' | \
+perl -pe 's/\bJun\b/06/' | \
+perl -pe 's/\bJul\b/07/' | \
+perl -pe 's/\bAug\b/08/' | \
+perl -pe 's/\bSep\b/09/' | \
+perl -pe 's/\bOct\b/10/' | \
+perl -pe 's/\bNov\b/11/' | \
+perl -pe 's/\bDec\b/12/' | \
+perl -pe 's/\bJanuary\b/01/' | \
+perl -pe 's/\bFebruary\b/02/' | \
+perl -pe 's/\bMarch\b/03/' | \
+perl -pe 's/\bApril\b/04/' | \
+perl -pe 's/\bMay\b/05/' | \
+perl -pe 's/\bJune\b/06/' | \
+perl -pe 's/\bJuly\b/07/' | \
+perl -pe 's/\bAugust\b/08/' | \
+perl -pe 's/\bSeptember\b/09/' | \
+perl -pe 's/\bOctober\b/10/' | \
+perl -pe 's/\bNovember\b/11/' | \
+perl -pe 's/\bDecember\b/12/'
