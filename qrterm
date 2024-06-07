@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+
+import pyqrcode
+import sys
+
+assert len(sys.argv) == 2
+
+print(pyqrcode.create(sys.argv[1]).terminal())
