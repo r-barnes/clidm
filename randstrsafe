@@ -1,3 +1,5 @@
 #!/bin/bash
 #cat /dev/urandom | tr -dc 'a-zA-Z0-9_!@#$%^&*()[]{};:<>,./?+=' | head -c $1
-tr -dc A-Za-z0-9_ < /dev/urandom | head -c $1
+passwd=`tr -dc A-Za-z0-9_ < /dev/urandom | head -c $1`
+echo "$passwd"
+echo "$passwd" | xclip
